@@ -1,3 +1,4 @@
+'use client';
 import { books } from '../data/books';
 import BookCard from '../components/BookCard';
 import { useState } from 'react';
