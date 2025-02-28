@@ -1,45 +1,67 @@
-// src/app/books/[id]/page.tsx
-export default function BookDetail({ params }: { params: { id: string } }) {
-    // Fetch book details based on the ID (replace with your data fetching logic)
-    const book = {
-      id: params.id,
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      price: 10.99,
-      image: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      description: "The Great Gatsby is a 1925 novel by American writer F. Scott Fitzgerald. Set in the Jazz Age on Long Island, the novel depicts narrator Nick Carraway's interactions with mysterious millionaire Jay Gatsby and Gatsby's obsession to reunite with his former lover, Daisy Buchanan.",
-    };
-  
-    return (
-      <div className="bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Book Image and Details */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Book Image */}
-            <div className="lg:order-2">
-              <img
-                src={book.image}
-                alt={book.title}
-                className="w-full h-auto rounded-lg shadow-lg"
-              />
-            </div>
-  
-            {/* Book Details */}
-            <div className="lg:order-1">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">{book.title}</h1>
-              <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
-              <p className="text-2xl font-bold text-gray-900 mb-6">${book.price.toFixed(2)}</p>
-  
-              {/* Book Description */}
-              <p className="text-gray-700 mb-8">{book.description}</p>
-  
-              {/* Add to Cart Button */}
-              <button className="w-full lg:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                Add to Cart
-              </button>
-            </div>
+// src/app/admin/books/page.tsx
+export default function ManageBooks() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Books</h1>
+
+      {/* Search and Add Book Button */}
+      <div className="flex justify-between items-center mb-6">
+        <input
+          type="text"
+          placeholder="Search books..."
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          Add Book
+        </button>
+      </div>
+
+      {/* Books Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left">Title</th>
+              <th className="px-4 py-2 text-left">Author</th>
+              <th className="px-4 py-2 text-left">Price</th>
+              <th className="px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b">
+              <td className="px-4 py-2">The Great Gatsby</td>
+              <td className="px-4 py-2">F. Scott Fitzgerald</td>
+              <td className="px-4 py-2">$10.99</td>
+              <td className="px-4 py-2">
+                <button className="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                <button className="text-red-600 hover:text-red-800">Delete</button>
+              </td>
+            </tr>
+            <tr className="border-b">
+              <td className="px-4 py-2">To Kill a Mockingbird</td>
+              <td className="px-4 py-2">Harper Lee</td>
+              <td className="px-4 py-2">$12.99</td>
+              <td className="px-4 py-2">
+                <button className="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                <button className="text-red-600 hover:text-red-800">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        <div className="flex justify-between items-center mt-6">
+          <p className="text-sm text-gray-600">Showing 1 to 10 of 100 entries</p>
+          <div className="flex space-x-2">
+            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+              Previous
+            </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Next
+            </button>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
