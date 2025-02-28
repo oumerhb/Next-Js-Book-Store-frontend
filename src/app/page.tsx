@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { Navbar } from "./Navbar";
-import { HeroSection } from "./Hero";
-import { FeaturedBooks } from "./Featured";
-import { Categories } from "./Categories";
-import { BestSellers } from "./BestSeller";
-import { Testimonials } from "./Testimonial";
-import { Footer } from "./Footer";
+import { Navbar } from "../Components/Navbar";
+import { HeroSection } from "../Components/Hero";
+import { FeaturedBooks } from "../Components/Featured";
+import { Categories } from "../Components/Categories";
+import { BestSellers } from "../Components/BestSeller";
+import { Testimonials } from "../Components/Testimonial";
+import { Footer } from "../Components/Footer";
 
 export default function Home() {
   return (
