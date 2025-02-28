@@ -44,7 +44,7 @@ export function Cart() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
+    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Cart</h2>
 
       {/* Cart Items */}
@@ -53,7 +53,10 @@ export function Cart() {
       ) : (
         <div className="space-y-6">
           {cartItems.map((item) => (
-            <div key={item.id} className="flex items-center justify-between border-b pb-4">
+            <div
+              key={item.id}
+              className="flex items-center justify-between border-b pb-6"
+            >
               {/* Book Image */}
               <div className="w-20 h-20 flex-shrink-0">
                 <img
@@ -64,32 +67,34 @@ export function Cart() {
               </div>
 
               {/* Book Details */}
-              <div className="flex-1 ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+              <div className="flex-1 ml-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {item.title}
+                </h3>
                 <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
               </div>
 
               {/* Quantity Controls */}
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-6">
                 <input
                   type="number"
                   value={item.quantity}
                   onChange={(e) =>
                     handleQuantityChange(item.id, parseInt(e.target.value))
                   }
-                  className="w-16 px-3 py-2 border border-gray-300 rounded-md text-center"
+                  className="w-16 px-3 py-2 border border-gray-300 rounded-md text-center font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="1"
                 />
                 <button
                   onClick={() => handleRemoveItem(item.id)}
-                  className="text-red-600 hover:text-red-800 transition-colors"
+                  className="text-sm text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors"
                 >
                   Remove
                 </button>
               </div>
 
               {/* Subtotal */}
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 font-mono ml-6">
                 ${(item.price * item.quantity).toFixed(2)}
               </p>
             </div>
@@ -102,11 +107,13 @@ export function Cart() {
         <div className="mt-8 border-t pt-6">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">Total</h3>
-            <p className="text-xl font-bold text-gray-900">${totalPrice.toFixed(2)}</p>
+            <p className="text-xl font-bold text-gray-900 font-mono">
+              ${totalPrice.toFixed(2)}
+            </p>
           </div>
           <Link
             href="/checkout"
-            className="mt-6 w-full flex justify-center py-3 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="mt-6 w-full flex justify-center py-3 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
           >
             Proceed to Checkout
           </Link>

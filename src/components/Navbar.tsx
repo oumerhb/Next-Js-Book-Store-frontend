@@ -2,10 +2,17 @@
 "use client"; // Mark as a Client Component for interactivity
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu visibility
+
+  // Toggle mobile menu
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <nav className="bg-white shadow-md">
@@ -89,6 +96,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden">
             <button
+              onClick={toggleMenu} // Toggle mobile menu on click
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 focus:outline-none"
             >
@@ -99,16 +107,57 @@ export function Navbar() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
+                {isMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  />
+                )}
               </svg>
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                href="/browse"
+                className="block text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors"
+              >
+                Browse
+              </Link>
+              <Link
+                href="/categories"
+                className="block text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors"
+              >
+                Categories
+              </Link>
+              <Link
+                href="/best-sellers"
+                className="block text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors"
+              >
+                Best Sellers
+              </Link>
+              <Link
+                href="/about"
+                className="block text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium transition-colors"
+              >
+                About Us
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

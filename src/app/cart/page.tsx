@@ -1,5 +1,5 @@
 // src/app/cart/page.tsx
-import { Cart } from "@/Components/Cart";
+import { Cart } from "@/components/Cart";
 
 export default function CartPage() {
   return (
