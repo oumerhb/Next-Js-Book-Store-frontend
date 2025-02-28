@@ -1,14 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "baseUrl": ".",
+    "paths": {
+      "@/public/*": ["public/*"],
+      "@/components/*": ["app/components/*"],
+      "@/loading-ui/*": ["app/components/loading-ui/*"],
+      "@/icons/*": ["app/icons/*"],
+      "@/utils/*": ["lib/utils/*"],
+      "@/types/*": ["lib/types/*"],
+      "@/hooks": ["lib/hooks"],
+      "@/store/*": ["lib/store/*"],
+      "@/lib/*": ["lib/*"]
+    },
+    "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -17,11 +30,14 @@
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": ["./*"]
-    }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "/Users/satnaing/dev/react/next-bookstore/.next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
