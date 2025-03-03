@@ -45,7 +45,6 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <br /><br />
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
 
       {/* Stats Cards */}

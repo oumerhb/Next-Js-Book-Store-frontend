@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { useState } from "react";
 
@@ -91,13 +91,12 @@ export default function ViewOrders() {
                 <td className="px-4 py-2 text-sm text-gray-700">{order.amount}</td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      order.status === "Completed"
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === "Completed"
                         ? "bg-green-100 text-green-800"
                         : order.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {order.status}
                   </span>
@@ -106,27 +105,27 @@ export default function ViewOrders() {
             ))}
           </tbody>
         </table>
-      </div>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-6">
-        <button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-700">
-          Page {currentPage} of {Math.ceil(filteredOrders.length / itemsPerPage)}
-        </span>
-        <button
-          onClick={nextPage}
-          disabled={currentPage === Math.ceil(filteredOrders.length / itemsPerPage)}
-          className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
-        >
-          Next
-        </button>
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-6">
+          <p className="text-sm text-gray-600">Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredOrders.length)} of {filteredOrders.length} entries</p>
+          <div className="flex space-x-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Previous
+            </button>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === Math.ceil(filteredOrders.length / itemsPerPage)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
