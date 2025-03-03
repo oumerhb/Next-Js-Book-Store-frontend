@@ -1,5 +1,5 @@
-// src/app/admin/orders/page.tsx
-"use client"; // Ensure this is a client component
+
+"use client"; 
 
 import { useState } from "react";
 
