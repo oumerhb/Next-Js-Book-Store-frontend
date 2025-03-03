@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative w-64 bg-gradient-to-b from-blue-600 to-blue-800 shadow-lg transform transition-transform duration-200 ease-in-out h-screen ${
+        className={`fixed md:relative w-64 bg-gradient-to-b from-blue-600 to-blue-800 shadow-lg transform transition-transform duration-200 ease-in-out min-h-screen ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
