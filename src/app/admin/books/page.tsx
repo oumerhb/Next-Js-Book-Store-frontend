@@ -1,24 +1,25 @@
 // src/app/admin/books/page.tsx
 export default function ManageBooks() {
-    return (
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Books</h1>
-  
-        {/* Search and Add Book Button */}
-        <div className="flex justify-between items-center mb-6">
-          <input
-            type="text"
-            placeholder="Search books..."
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700 w-full max-w-md"
-          />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            Add Book
-          </button>
-        </div>
-  
-        {/* Books Table */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <table className="w-full">
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Books</h1>
+
+      {/* Search and Add Book Button */}
+      <div className="flex justify-between items-center mb-6">
+        <input
+          type="text"
+          placeholder="Search books..."
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700 w-full max-w-md"
+        />
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          Add Book
+        </button>
+      </div>
+
+      {/* Books Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="overflow-x-auto ">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Title</th>
@@ -73,20 +74,21 @@ export default function ManageBooks() {
               </tr>
             </tbody>
           </table>
-  
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-6">
-            <p className="text-sm text-gray-600">Showing 1 to 10 of 100 entries</p>
-            <div className="flex space-x-2">
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
-                Previous
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                Next
-              </button>
-            </div>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-between items-center mt-6">
+          <p className="text-sm text-gray-600">Showing 1 to 10 of 100 entries</p>
+          <div className="flex space-x-2">
+            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+              Previous
+            </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+              Next
+            </button>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
