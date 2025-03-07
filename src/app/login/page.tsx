@@ -43,16 +43,15 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         const token = response.headers.get("Authorization")?.split(" ")[1];
         if (token) {
-          // Store the token in local storage or secure cookies
+          // Store the token in local storage
           localStorage.setItem("token", token);
-
-          // Get the redirect URL from query params
-          // const redirectUrl = new URLSearchParams(window.location.search).get("redirect") || "/";
-
-          // Redirect to the target page after successful login
-          router.push('/');
+          // Store the user info in local storage
+          localStorage.setItem("user", JSON.stringify(data.user));
+          // Redirect to dashboard or home page after successful login
+          router.push("/");
         } else {
           setError("Login failed. Please try again.");
           console.error("Login failed: No token received.");
