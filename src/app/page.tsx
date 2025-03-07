@@ -1,7 +1,6 @@
-import Image from "next/image";
 import { Navbar } from "../components/Navbar";
 import { HeroSection } from "../components/Hero";
-import {FeaturedBooks}  from "../components/FeaturedBooks";
+import { FeaturedBooks }  from "../components/FeaturedBooks";
 import { Categories } from "../components/Categories";
 import { BestSellers } from "../components/BestSeller";
 import { Testimonials } from "../components/Testimonial";
