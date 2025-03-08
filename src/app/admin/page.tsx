@@ -1,5 +1,7 @@
 "use client"; // Mark as a Client Component for interactivity
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,6 +17,59 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function AdminDashboard() {
+  // const router = useRouter();
+  // const [isAuthorized, setIsAuthorized] = useState(false);
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const checkAdminRole = async () => {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       console.error("No token found in local storage");
+  //       router.push("/unauthorized");
+  //       return;
+  //     }
+
+  //     try {
+  //       const response = await fetch("http://localhost:8000/api/admin", {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${token}`,
+  //         },
+  //       });
+
+  //       if (response.ok) {
+  //         setIsAuthorized(true);
+  //       } else {
+  //         console.error("Authorization failed:", response.status, response.statusText);
+  //         router.push("/unauthorized"); // Redirect to unauthorized page
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking admin role:", error);
+  //       router.push("/unauthorized"); // Redirect to unauthorized page
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   checkAdminRole();
+  // }, [router]);
+
+  // // Block rendering until the authorization check is complete
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <p>Loading...</p>
+  //     </div>
+  //   );
+  // }
+
+  // // Render the dashboard only if authorized
+  // if (!isAuthorized) {
+  //   return null; // Do not render anything if unauthorized
+  // }
+
   // Data for the bar chart
   const chartData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
