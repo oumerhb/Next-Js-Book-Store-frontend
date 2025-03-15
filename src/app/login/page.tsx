@@ -1,85 +1,80 @@
-"use client"; // Mark as a Client Component for interactivity
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
 
-    // Basic validation
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      setError('Please fill in all fields.');
+      setLoading(false);
       return;
     }
 
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address.");
+      setError('Please enter a valid email address.');
+      setLoading(false);
       return;
     }
 
-    // Simulate login API call
     try {
-      const response = await fetch("http://localhost:8000/api/users/login", {
-        method: "POST",
+      const response = await fetch('http://localhost:8000/api/users/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
 
-      // Log all response headers
-      response.headers.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-      });
-
-      if (response.ok) {
+      if (!response.ok) {
         const data = await response.json();
-        const token = response.headers.get("Authorization")?.split(" ")[1];
-        if (token) {
-          // Store the token in local storage
-          localStorage.setItem("token", token);
-          // Store the user info in local storage
-          localStorage.setItem("user", JSON.stringify(data.user));
-          // Redirect to dashboard or home page after successful login
-          router.push("/");
-        } else {
-          setError("Login failed. Please try again.");
-          console.error("Login failed: No token received.");
-        }
+        setError(data.message || 'Login failed. Please try again.');
       } else {
         const data = await response.json();
-        setError(data.message || "Login failed. Please try again.");
-        console.error("Login failed:", data.message || "Unknown error.");
+        const token = response.headers.get('Authorization')?.split(' ')[1];
+
+        if (token) {
+          document.cookie = `token=${token}; path=/; secure; samesite=strict`;
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          router.push('/');
+        } else {
+          setError('Login failed. Please try again.');
+        }
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error("An error occurred:", err);
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Login</h2>
 
-        {/* Error Message */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -88,8 +83,7 @@ export default function LoginPage() {
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
               required
             />
@@ -102,8 +96,7 @@ export default function LoginPage() {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
               required
             />
@@ -112,17 +105,17 @@ export default function LoginPage() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>
 
-        {/* Sign Up Link */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link href="/signup" className="text-blue-600 hover:text-blue-500">
               Sign up
             </Link>

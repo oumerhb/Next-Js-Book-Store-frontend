@@ -1,197 +1,39 @@
-"use client"; // Mark as a Client Component for interactivity
+// app/admin/page.tsx (Server Component)
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { AdminDashboardContent } from '@/components/AdminDashboardContent'; // Adjust path
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+async function checkAuthorization() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value; // Get token from cookie
 
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+  if (!token) {
+    return false;
+  }
 
-export default function AdminDashboard() {
-  // const router = useRouter();
-  // const [isAuthorized, setIsAuthorized] = useState(false);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const checkAdminRole = async () => {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       console.error("No token found in local storage");
-  //       router.push("/unauthorized");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await fetch("http://localhost:8000/api/admin", {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": `Bearer ${token}`,
-  //         },
-  //       });
-
-  //       if (response.ok) {
-  //         setIsAuthorized(true);
-  //       } else {
-  //         console.error("Authorization failed:", response.status, response.statusText);
-  //         router.push("/unauthorized"); // Redirect to unauthorized page
-  //       }
-  //     } catch (error) {
-  //       console.error("Error checking admin role:", error);
-  //       router.push("/unauthorized"); // Redirect to unauthorized page
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   checkAdminRole();
-  // }, [router]);
-
-  // // Block rendering until the authorization check is complete
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <p>Loading...</p>
-  //     </div>
-  //   );
-  // }
-
-  // // Render the dashboard only if authorized
-  // if (!isAuthorized) {
-  //   return null; // Do not render anything if unauthorized
-  // }
-
-  // Data for the bar chart
-  const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
-    datasets: [
-      {
-        label: "Sales",
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: "rgba(59, 130, 246, 0.6)",
-        borderColor: "rgba(59, 130, 246, 1)",
-        borderWidth: 1,
+  try {
+    const response = await fetch('http://localhost:8000/api/admin', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Referer': 'http://localhost:3000/login',
+        Authorization: `Bearer ${token}`,
       },
-    ],
-  };
+    });
 
-  // Options for the bar chart
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top" as const, // Use 'as const' for TypeScript
-      },
-      title: {
-        display: true,
-        text: "Monthly Sales",
-      },
-    },
-  };
+    return response.ok;
+  } catch (error) {
+    console.error('Error checking authorization:', error);
+    return false;
+  }
+}
 
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+export default async function AdminDashboardPage() {
+  const isAuthorized = await checkAuthorization();
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h3 className="text-lg font-semibold text-gray-700">Total Books</h3>
-          <p className="text-2xl font-bold text-blue-600">1,234</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
-          <p className="text-2xl font-bold text-blue-600">567</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h3 className="text-lg font-semibold text-gray-700">Total Users</h3>
-          <p className="text-2xl font-bold text-blue-600">890</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <h3 className="text-lg font-semibold text-gray-700">Revenue</h3>
-          <p className="text-2xl font-bold text-blue-600">$12,345</p>
-        </div>
-      </div>
+  if (!isAuthorized) {
+    redirect('/unauthorized'); // Redirect if unauthorized
+  }
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <Bar data={chartData} options={chartOptions} />
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Recent Activity</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600">New order placed</p>
-              <p className="text-sm text-gray-500">2 hours ago</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600">User registered</p>
-              <p className="text-sm text-gray-500">5 hours ago</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600">Book added</p>
-              <p className="text-sm text-gray-500">1 day ago</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Orders Table */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-700 mb-4">Recent Orders</h3>
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left">Order ID</th>
-              <th className="px-4 py-2 text-left">Customer</th>
-              <th className="px-4 py-2 text-left">Amount</th>
-              <th className="px-4 py-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td className="px-4 py-2">#12345</td>
-              <td className="px-4 py-2">John Doe</td>
-              <td className="px-4 py-2">$49.99</td>
-              <td className="px-4 py-2">
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                  Completed
-                </span>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="px-4 py-2">#12346</td>
-              <td className="px-4 py-2">Jane Smith</td>
-              <td className="px-4 py-2">$99.99</td>
-              <td className="px-4 py-2">
-                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">
-                  Pending
-                </span>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="px-4 py-2">#12347</td>
-              <td className="px-4 py-2">Alice Johnson</td>
-              <td className="px-4 py-2">$29.99</td>
-              <td className="px-4 py-2">
-                <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm">
-                  Cancelled
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <AdminDashboardContent />;
 }

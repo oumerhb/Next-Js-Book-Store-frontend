@@ -1,72 +1,38 @@
-// src/app/admin/users/page.tsx
-export default function ManageUsers() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Manage Users</h1>
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import ManageUsers from "@/components/ManageUsers";
 
-      {/* Search Bar */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search users..."
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700 w-full sm:max-w-lg"
-        />
-      </div>
+async function checkAuthorization() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value; // Get token from cookie
 
-      {/* Users Table */}
-      <div className="bg-white p-6 rounded-lg shadow-md ">
-        <h3 className="text-lg font-semibold text-gray-700 mb-4">User List</h3>
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Name</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Email</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Role</th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-2 text-sm text-gray-700">John Doe</td>
-              <td className="px-4 py-2 text-sm text-gray-700">john@example.com</td>
-              <td className="px-4 py-2">
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                  Admin
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <button className="text-blue-600 hover:text-blue-800 mr-2 text-sm">Edit</button>
-                <button className="text-red-600 hover:text-red-800 text-sm">Delete</button>
-              </td>
-            </tr>
-            <tr className="border-b hover:bg-gray-50 transition-colors">
-              <td className="px-4 py-2 text-sm text-gray-700">Jane Smith</td>
-              <td className="px-4 py-2 text-sm text-gray-700">jane@example.com</td>
-              <td className="px-4 py-2">
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                  User
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <button className="text-blue-600 hover:text-blue-800 mr-2 text-sm">Edit</button>
-                <button className="text-red-600 hover:text-red-800 text-sm">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-          <p className="text-sm text-gray-600">Showing 1 to 10 of 100 entries</p>
-          <div className="flex space-x-2">
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
-              Previous
-            </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const response = await fetch('http://localhost:8000/api/admin', {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Referer': 'http://localhost:3000/login',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error('Error checking authorization:', error);
+    return false;
+  }
+}
+
+export default async function ManageBooksPages() {
+  const isAuthorized = await checkAuthorization();
+
+  if (!isAuthorized) {
+    redirect('/unauthorized');
+  }
+
+  return <ManageUsers />;
 }

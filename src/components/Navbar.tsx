@@ -1,6 +1,7 @@
 "use client"; // Mark as a Client Component for interactivity
 
 import Link from "next/link";
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -124,7 +125,7 @@ export function Navbar() {
                     <div className="border-t mt-1">
                       <button
                         onClick={() => {
-                          localStorage.removeItem("token");
+                          Cookies.remove("token")
                           localStorage.removeItem("user");
                           setUser(null);
                           router.push("/");
