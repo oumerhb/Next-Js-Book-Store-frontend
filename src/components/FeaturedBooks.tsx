@@ -1,38 +1,48 @@
-// src/components/FeaturedBooks.tsx
-import { Book } from "./Book";
+// app/components/FeaturedBooks.tsx (Server Component)
+import { Book as BookType } from "../types";
+import Book from "./Book"; // Client component
 
-export function FeaturedBooks() {
-  // Sample data for featured books
-  const featuredBooks = [
-    {
-      id: "1",
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      price: 10.99,
-      image: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    },
-    {
-      id: "2",
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      price: 12.99,
-      image: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
-    },
-    {
-      id: "3",
-      title: "1984",
-      author: "George Orwell",
-      price: 9.99,
-      image: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-    },
-    {
-      id: "4",
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      price: 8.99,
-      image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
-    },
-  ];
+async function fetchFeaturedBooks(): Promise<BookType[]> {
+  try {
+    const response = await fetch("http://localhost:8000/api/books?limit=3");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch featured books");
+    }
+
+    const data = await response.json();
+
+    // Validate the fetched data
+    if (!Array.isArray(data)) {
+      throw new Error("Invalid data format: expected an array of books.");
+    }
+
+    // Filter out invalid or undefined book objects and parse `price` into a number
+    const validBooks = data
+      .filter(
+        (book) =>
+          book &&
+          book.id &&
+          book.title &&
+          book.author &&
+          book.price && // Ensure `price` is defined
+          book.image_data
+      )
+      .map((book) => ({
+        ...book,
+        price: parseFloat(book.price), // Parse `price` into a number
+      }));
+
+    return validBooks;
+  } catch (error) {
+    console.error("Error fetching featured books:", error);
+    throw new Error("Failed to fetch featured books");
+  }
+}
+
+export default async function FeaturedBooks() {
+  // Fetch data on the server
+  const featuredBooks = await fetchFeaturedBooks();
 
   return (
     <div className="bg-white py-12">
@@ -40,19 +50,21 @@ export function FeaturedBooks() {
         {/* Section Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Featured Books</h2>
 
+        {/* Empty State */}
+        {featuredBooks.length === 0 && (
+          <div className="text-center text-gray-600">
+            <p>No books available right now.</p>
+          </div>
+        )}
+
         {/* Books Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredBooks.map((book) => (
-            <Book
-              key={book.id}
-              id={book.id}
-              title={book.title}
-              author={book.author}
-              price={book.price}
-              image={book.image}
-            />
-          ))}
-        </div>
+        {featuredBooks.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredBooks.map((book) => (
+              <Book key={book.id} book={book} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
