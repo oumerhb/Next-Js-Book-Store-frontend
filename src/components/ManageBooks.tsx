@@ -23,7 +23,7 @@ export default function ManageBooks() {
     published_year: '',
     genre: '',
     description: '',
-    image: '', // Base64-encoded image
+    image: null as File | null, // File object for the image
     price: '',
     stock: '',
   });
@@ -38,7 +38,14 @@ export default function ManageBooks() {
   const fetchBooks = async () => {
     const token = Cookies.get('token');
 
+    if (!token) {
+      console.error('No token found in cookies');
+      setError('Authentication token is missing. Please log in again.');
+      return;
+    }
+
     try {
+      console.log('Fetching books...');
       const response = await fetch('http://localhost:8000/api/books', {
         method: 'GET',
         headers: {
@@ -48,20 +55,21 @@ export default function ManageBooks() {
       });
 
       if (!response.ok) {
+        console.error('Failed to fetch books. Response status:', response.status);
         throw new Error('Failed to fetch books');
       }
 
       const data = await response.json();
+      console.log('Books fetched successfully:', data);
 
-      // Parse numeric fields
       const parsedBooks = data.map((book: any) => ({
         ...book,
-        price: parseFloat(book.price), // Convert price to a number
-        published_year: parseInt(book.published_year, 10), // Convert published_year to a number
-        stock: parseInt(book.stock, 10), // Convert stock to a number
+        price: parseFloat(book.price),
+        published_year: parseInt(book.published_year, 10),
+        stock: parseInt(book.stock, 10),
       }));
 
-      setBooks(parsedBooks); // Update the books state
+      setBooks(parsedBooks);
     } catch (error) {
       console.error('Error fetching books:', error);
       setError('Failed to fetch books. Please try again.');
@@ -76,103 +84,107 @@ export default function ManageBooks() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewBook({ ...newBook, image: reader.result as string }); // Store Base64-encoded image
-      };
-      reader.readAsDataURL(file); // Convert image to Base64
+      if (!file.type.startsWith('image/')) {
+        console.error('Invalid file type:', file.type);
+        setError('Please upload a valid image file.');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        console.error('File size too large:', file.size);
+        setError('The image file size should not exceed 5MB.');
+        return;
+      }
+      console.log('Image selected:', file.name);
+      setNewBook({ ...newBook, image: file });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null); // Reset error state
+    setError(null);
 
     // Validate that the image is uploaded
     if (!newBook.image) {
+      console.error('Image is required');
       setError('The image field is required.');
       return;
     }
 
-    // Validate that the price is a valid number with 2 decimal places
-    const priceValue = parseFloat(newBook.price);
-    if (isNaN(priceValue) || !/^\d+(\.\d{1,2})?$/.test(newBook.price)) {
-      setError('Please enter a valid price with up to 2 decimal places.');
-      return;
-    }
+    // Convert the image file to a Base64 string with the prefix
+    const reader = new FileReader();
+    reader.readAsDataURL(newBook.image);
+    reader.onload = async () => {
+      const base64Image = reader.result as string; // This includes the prefix
 
-    // Validate that the stock is a non-negative integer
-    const stockValue = parseInt(newBook.stock, 10);
-    if (isNaN(stockValue) || stockValue < 0) {
-      setError('Please enter a valid stock value (non-negative integer).');
-      return;
-    }
+      // Prepare the data for the API request
+      const bookData = {
+        title: newBook.title,
+        author: newBook.author,
+        published_year: parseInt(newBook.published_year, 10),
+        genre: newBook.genre,
+        description: newBook.description,
+        image_data: base64Image, // Send the full Base64 string with prefix
+        price: parseFloat(newBook.price).toFixed(2),
+        stock: parseInt(newBook.stock, 10),
+      };
 
-    interface BookData {
-      title: string;
-      author: string;
-      published_year: number;
-      genre: string;
-      description: string;
-      image_data: string; // Base64-encoded image
-      price: number; // Decimal with 2 decimal places
-      stock: number; // Non-negative integer
-    }
+      const token = Cookies.get('token');
 
-    // Prepare the data for the API request
-    const bookData: BookData = {
-      title: newBook.title,
-      author: newBook.author,
-      published_year: parseInt(newBook.published_year, 10),
-      genre: newBook.genre,
-      description: newBook.description,
-      image_data: newBook.image, // Base64-encoded image
-      price: parseFloat(priceValue.toFixed(2)), // Ensure price has 2 decimal places
-      stock: stockValue, // Ensure stock is a non-negative integer
-    };
-
-    // Get the token from cookies
-    const token = Cookies.get('token');
-
-    try {
-      const response = await fetch('http://localhost:8000/api/admin/books', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Referer: window.location.href,
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(bookData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to add book');
+      if (!token) {
+        console.error('No token found in cookies');
+        setError('Authentication token is missing. Please log in again.');
+        return;
       }
 
-      const result = await response.json();
-      console.log('Book added successfully:', result);
+      try {
+        console.log('Adding new book...');
+        const response = await fetch('http://localhost:8000/api/admin/books', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(bookData),
+        });
 
-      // Close the modal and reset the form
-      setIsModalOpen(false);
-      setNewBook({
-        title: '',
-        author: '',
-        published_year: '',
-        genre: '',
-        description: '',
-        image: '',
-        price: '',
-        stock: '',
-      });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Failed to add book. Response status:', response.status, 'Error:', errorData);
+          throw new Error(errorData.error || 'Failed to add book');
+        }
 
-      // Refetch books to update the list
-      fetchBooks();
-    } catch (error) {
-      console.error('Error adding book:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-    }
+        const result = await response.json();
+        console.log('Book added successfully:', result);
+
+        // Close the modal and reset the form
+        setIsModalOpen(false);
+        setNewBook({
+          title: '',
+          author: '',
+          published_year: '',
+          genre: '',
+          description: '',
+          image: null,
+          price: '',
+          stock: '',
+        });
+
+        // Refetch books to update the list
+        fetchBooks();
+      } catch (error) {
+        console.error('Error adding book:', error);
+        setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      }
+    };
+
+    reader.onerror = (error) => {
+      console.error('Error reading image file:', error);
+      setError('Failed to process the image. Please try again.');
+    };
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setError(null);
   };
 
   return (
@@ -309,7 +321,7 @@ export default function ManageBooks() {
                   value={newBook.price}
                   onChange={handleInputChange}
                   className="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
-                  step="0.01" // Allow decimal values
+                  step="0.01"
                   required
                 />
               </div>
@@ -321,7 +333,7 @@ export default function ManageBooks() {
                   value={newBook.stock}
                   onChange={handleInputChange}
                   className="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
-                  min="0" // Ensure non-negative values
+                  min="0"
                   required
                 />
               </div>
@@ -338,7 +350,7 @@ export default function ManageBooks() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={closeModal}
                   className="mr-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Cancel
