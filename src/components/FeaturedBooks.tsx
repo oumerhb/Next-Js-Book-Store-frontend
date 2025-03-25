@@ -1,10 +1,13 @@
 // app/components/FeaturedBooks.tsx (Server Component)
 import { Book as BookType } from "../types";
 import Book from "./Book"; // Client component
+import FeaturedBooksClient from './FeaturedBooksClient'; // New client component
 
 async function fetchFeaturedBooks(): Promise<BookType[]> {
   try {
-    const response = await fetch("http://localhost:8000/api/books?limit=3");
+    const response = await fetch("http://localhost:8000/api/books?limit=3", {
+      next: { tags: ['featured-books'] } // Add cache tagging
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch featured books");
@@ -17,7 +20,7 @@ async function fetchFeaturedBooks(): Promise<BookType[]> {
       throw new Error("Invalid data format: expected an array of books.");
     }
 
-    // Filter out invalid or undefined book objects and parse `price` into a number
+    // Filter and transform data
     const validBooks = data
       .filter(
         (book) =>
@@ -25,47 +28,23 @@ async function fetchFeaturedBooks(): Promise<BookType[]> {
           book.id &&
           book.title &&
           book.author &&
-          book.price && // Ensure `price` is defined
+          book.price !== undefined && // More precise check
           book.image_data
       )
       .map((book) => ({
         ...book,
-        price: parseFloat(book.price), // Parse `price` into a number
+        price: parseFloat(book.price),
       }));
 
     return validBooks;
   } catch (error) {
     console.error("Error fetching featured books:", error);
-    throw new Error("Failed to fetch featured books");
+    return []; // Return empty array instead of throwing to prevent page crash
   }
 }
 
 export default async function FeaturedBooks() {
-  // Fetch data on the server
   const featuredBooks = await fetchFeaturedBooks();
-
-  return (
-    <div className="bg-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Featured Books</h2>
-
-        {/* Empty State */}
-        {featuredBooks.length === 0 && (
-          <div className="text-center text-gray-600">
-            <p>No books available right now.</p>
-          </div>
-        )}
-
-        {/* Books Grid */}
-        {featuredBooks.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredBooks.map((book) => (
-              <Book key={book.id} book={book} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  
+  return <FeaturedBooksClient books={featuredBooks} />;
 }
