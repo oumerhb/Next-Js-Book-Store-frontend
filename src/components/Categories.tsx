@@ -1,7 +1,12 @@
 // src/components/Categories.tsx
+"use client";
+
 import { CategoryCard } from "./CategoryCard";
+import { useRouter } from "next/navigation";
 
 export function Categories() {
+  const router = useRouter();
+
   // Real image links for categories
   const categories = [
     {
@@ -26,6 +31,11 @@ export function Categories() {
     },
   ];
 
+  const handleCategoryClick = (category: string) => {
+    // Navigate to the category page
+    router.push(`/categories/${category.toLowerCase()}`);
+  };
+
   return (
     <div className="bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +49,7 @@ export function Categories() {
               key={index}
               title={category.title}
               image={category.image}
-              href={category.href}
+              onClick={() => handleCategoryClick(category.title)}
             />
           ))}
         </div>

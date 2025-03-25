@@ -1,29 +1,35 @@
 // src/components/CategoryCard.tsx
-import Link from "next/link";
+"use client";
 
-export function CategoryCard({ title, image, href }: { title: string; image: string; href: string }) {
+interface CategoryCardProps {
+  title: string;
+  image: string;
+  onClick: () => void;
+}
+
+export function CategoryCard({ title, image, onClick }: CategoryCardProps) {
   return (
-    <div className="group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-      {/* Category Name */}
-      <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">{title}</h3>
-
-      {/* Image Container */}
-      <div className="relative overflow-hidden rounded-lg">
-        {/* Category Image */}
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-300"
-        />
-
-        {/* Explore Button (Visible on Hover) */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300">
-          <Link
-            href={href}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-blue-700"
+    <div 
+      className="relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      onClick={onClick}
+    >
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-48 object-cover"
+      />
+      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+        <div className="text-center p-4">
+          <h3 className="text-white text-2xl font-bold mb-2">{title}</h3>
+          <button
+            className="px-4 py-2 bg-white text-gray-800 font-medium rounded-md hover:bg-gray-100 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
           >
             Explore
-          </Link>
+          </button>
         </div>
       </div>
     </div>
