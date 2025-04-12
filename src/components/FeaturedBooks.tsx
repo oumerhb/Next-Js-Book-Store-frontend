@@ -1,50 +1,52 @@
-// app/components/FeaturedBooks.tsx (Server Component)
-import { Book as BookType } from "../types";
-import Book from "./Book"; // Client component
-import FeaturedBooksClient from './FeaturedBooksClient'; // New client component
+"use client"
+import {
+  useQuery,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import BookCard from "@/components/BookCard"
+import { fetchFeaturedBooks } from '@/lib/utils'
+import { SkeletonCard } from "@/components/skeleton"
 
-async function fetchFeaturedBooks(): Promise<BookType[]> {
-  try {
-    const response = await fetch("http://localhost:8000/api/books?limit=3", {
-      next: { tags: ['featured-books'] } // Add cache tagging
-    });
+const queryClient = new QueryClient()
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch featured books");
-    }
+export default function FeaturedBooks() {
+  return (
+    // Provide the client to your App
+    <QueryClientProvider client={queryClient}>
+      <Featured />
+    </QueryClientProvider>
+  )
+}
 
-    const data = await response.json();
+function Featured() {
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ['books'],
+    queryFn: fetchFeaturedBooks
+  })
 
-    // Validate the fetched data
-    if (!Array.isArray(data)) {
-      throw new Error("Invalid data format: expected an array of books.");
-    }
-
-    // Filter and transform data
-    const validBooks = data
-      .filter(
-        (book) =>
-          book &&
-          book.id &&
-          book.title &&
-          book.author &&
-          book.price !== undefined && // More precise check
-          book.image_data
-      )
-      .map((book) => ({
-        ...book,
-        price: parseFloat(book.price),
-      }));
-
-    return validBooks;
-  } catch (error) {
-    console.error("Error fetching featured books:", error);
-    return []; // Return empty array instead of throwing to prevent page crash
+  if (isPending) {
+    return <SkeletonCard />
   }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>
+  }
+
+  return (
+    <div className="p-6">
+      <h2 className="text-3xl md:text-4xl font-light font-serif tracking-tight text-gray-900 mb-6 text-left">
+        Featured Books
+      </h2>
+
+      <div className="flex flex-row gap-6 justify-center flex-wrap">
+        {data.map((book) => (
+          <BookCard book={book} key={book.id} />
+        ))}
+      </div>
+    </div>
+  )
 }
 
-export default async function FeaturedBooks() {
-  const featuredBooks = await fetchFeaturedBooks();
-  
-  return <FeaturedBooksClient books={featuredBooks} />;
-}
+
+
